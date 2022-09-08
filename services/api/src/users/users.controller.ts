@@ -28,7 +28,6 @@ import * as bcrypt from 'bcrypt';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as events from '../events/app.events';
 import { PermissionsService } from '../services/permissions/permissions';
-import { User } from './entities/user.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import * as e from '../auth/perms/user';
@@ -70,10 +69,7 @@ export default class UsersController {
       'the server encountered an unexpected condition that prevented it from fulfilling the request.',
     type: InternalServerErrorException,
   })
-  async create(
-    @Body() createUserDto: CreateUserDto,
-    @Session() session,
-  ): Promise<User | InternalServerErrorException> {
+  async create(@Body() createUserDto: CreateUserDto, @Session() session) {
     if (session.user) {
       // the user is already login
       return new UnauthorizedException('User already exist');

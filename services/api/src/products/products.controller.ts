@@ -388,7 +388,7 @@ export class ProductsController {
         fileSize: 2552000,
       },
       preservePath: true,
-      dest: 'uploads/images/products',
+      dest: '../uploads/images/products',
     }),
   )
   @ApiUnauthorizedResponse({
@@ -537,7 +537,7 @@ export class ProductsController {
         fileSize: 252000,
       },
       preservePath: true,
-      dest: 'uploads/images/products',
+      dest: '../uploads/images/products',
     }),
   )
   @ApiUnauthorizedResponse({

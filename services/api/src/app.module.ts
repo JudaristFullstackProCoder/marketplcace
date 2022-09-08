@@ -21,13 +21,21 @@ import { ShopkeepersModule } from './shopkeepers/shopkeepers.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { CommentsModule } from './comments/comments.module';
+import setEnv from '../app.env';
 
+// setEnv();
+
+console.log(process.env.MONGODB_URL);
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/nest-store-api', {
+    MongooseModule.forRoot(process.env.MONGODB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       family: 4,
+      auth: {
+        username: process.env.MONGODB_USER,
+        password: process.env.MONGODB_PASSWORD,
+      },
       connectionFactory: (connection) => {
         connection.plugin(autopup);
         connection.plugin(mp);
@@ -35,7 +43,7 @@ import { CommentsModule } from './comments/comments.module';
       },
     }),
     MulterModule.register({
-      dest: 'uploads',
+      dest: process.env.UPLOADS_FOLDER,
     }),
     EventEmitterModule.forRoot(),
     UsersModule,

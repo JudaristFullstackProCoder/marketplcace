@@ -357,7 +357,7 @@ export class VariationsController {
         fileSize: 252000,
       },
       preservePath: true,
-      dest: 'uploads/images/products',
+      dest: '../uploads/images/products',
     }),
   )
   @ApiUnauthorizedResponse({

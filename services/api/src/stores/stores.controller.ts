@@ -301,7 +301,7 @@ export class StoresController {
         fileSize: 22000,
       },
       preservePath: true,
-      dest: 'uploads/images/stores',
+      dest: '../uploads/images/stores',
     }),
   )
   @ApiUnauthorizedResponse({

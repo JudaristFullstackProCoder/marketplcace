@@ -9,23 +9,23 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(
     session({
-      secret: '$2b$15$Bzobfwji9AwUE7tWNxw8fuWVqUVWTDRuV8OBA4kwO3gorgaQ5nH.2',
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
     }),
   );
   app.use(helmet());
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN,
   });
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
-    .setTitle('Nest store api')
+    .setTitle('Marketplace API Documentation')
     .setDescription('This is a marketplace api')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  await app.listen(3001);
+  SwaggerModule.setup(process.env.OPEN_API_PATH, app, document);
+  await app.listen(parseInt(process.env.APP_PORT));
 }
 bootstrap();
