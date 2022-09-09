@@ -32,6 +32,7 @@ console.log(process.env.MONGODB_URL);
       useNewUrlParser: true,
       useUnifiedTopology: true,
       family: 4,
+      authSource: 'admin',
       auth: {
         username: process.env.MONGODB_USER,
         password: process.env.MONGODB_PASSWORD,
