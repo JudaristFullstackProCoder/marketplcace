@@ -44,7 +44,6 @@ services:
     restart: always
     command: yarn run dev
   mongo:
-    container_name: mongo
     image: mongo
     restart: always
     expose:
