@@ -5,6 +5,4 @@ WORKDIR /app
 VOLUME ./:./
 COPY ./package.json ./
 COPY ./yarn.lock ./
-# RUN if [${env} == 'dev']; then yarn install --force --production; else yarn install --force; fi
 COPY . .
-# RUN if [${env} == 'dev'] ;then yarn run start ; else yarn run dev; fi
