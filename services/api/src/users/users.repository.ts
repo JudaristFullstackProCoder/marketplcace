@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { ResponseApiController } from 'src/app.controller';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserDocument } from './entities/user.entity';
+import { UserDocument } from './entities/user.entity';
 
 @Injectable()
 export default class UsersRepository {
@@ -15,7 +15,7 @@ export default class UsersRepository {
     user: CreateUserDto,
   ): Promise<
     ResponseApiController<
-      User | {},
+      UserDocument | Record<string, unknown>,
       'can not created user' | 'user created successfully'
     >
   > {
@@ -29,7 +29,7 @@ export default class UsersRepository {
       return {
         message: 'can not created user',
         status: 500,
-        data: {},
+        data: { ...e },
       };
     }
   }
@@ -37,7 +37,7 @@ export default class UsersRepository {
     id: string,
   ): Promise<
     ResponseApiController<
-      {},
+      Record<string, unknown>,
       'user deleted successfully' | 'can not delete user'
     >
   > {
@@ -71,7 +71,7 @@ export default class UsersRepository {
     user: UpdateUserDto,
   ): Promise<
     ResponseApiController<
-      {},
+      Record<string, unknown>,
       'user updated successfully' | 'can not update user'
     >
   > {
@@ -103,7 +103,10 @@ export default class UsersRepository {
   async getUserById(
     id: string,
   ): Promise<
-    ResponseApiController<User | {}, 'not found' | 'internal server error' | ''>
+    ResponseApiController<
+      UserDocument | Record<string, unknown>,
+      'not found' | 'internal server error' | 'operation performed successfully'
+    >
   > {
     try {
       const user = await this.userModel.findById(id, '-password');
@@ -117,7 +120,7 @@ export default class UsersRepository {
       return {
         data: user,
         status: 200,
-        message: '',
+        message: 'operation performed successfully',
       };
     } catch (e) {
       return {
@@ -132,17 +135,25 @@ export default class UsersRepository {
 
   async getAllUsers(): Promise<
     ResponseApiController<
-      User[] | {},
-      'not found' | 'internal server error' | ''
+      Record<string, unknown>[] | Record<string, unknown>,
+      'not found' | 'internal server error' | 'operation performed successfully'
     >
   > {
     try {
       const users = await this.userModel.find();
       if (users) {
         return {
-          data: users.map((e) => e),
+          message: 'operation performed successfully',
           status: 200,
-          message: '',
+          data: users.map(function (e) {
+            return {
+              id: e._id,
+              username: e.username,
+              email: e.email,
+              createdAt: e['createdAt'],
+              updatedAt: e['updatedAt'],
+            };
+          }),
         };
       } else {
         return {
@@ -167,7 +178,7 @@ export default class UsersRepository {
     storeId: string,
   ): Promise<
     ResponseApiController<
-      {},
+      Record<string, unknown>,
       | `user successfully suscribed to store`
       | 'internal server error'
       | 'user can not subscribe to store'
@@ -213,7 +224,7 @@ export default class UsersRepository {
     storeId: string,
   ): Promise<
     ResponseApiController<
-      {},
+      Record<string, unknown>,
       | 'user unsubscribe successfully from store'
       | 'user can not unsuscribe from store'
     >
