@@ -11,7 +11,9 @@ import {
   Session,
   UseGuards,
   HttpCode,
-  UnauthorizedException,
+  UsePipes,
+  ValidationPipe,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -24,10 +26,8 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import * as bcrypt from 'bcrypt';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as events from '../events/app.events';
-import { PermissionsService } from '../services/permissions/permissions';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import * as e from '../auth/perms/user';
@@ -42,6 +42,7 @@ import { AdminAuthenticationGuard } from '../auth/admin.auth.guard';
 import { AddUserSubscriptionDto } from './dto/add-user-subscription.dto';
 import { RemoveUserSubscriptionDto } from './dto/remove-user-subscription.dto';
 import { UserAuthenticationGuard } from '../auth/user.auth.guard';
+import { Response } from 'express';
 
 @Controller('users')
 @ApiTags('User')
@@ -69,18 +70,32 @@ export default class UsersController {
       'the server encountered an unexpected condition that prevented it from fulfilling the request.',
     type: InternalServerErrorException,
   })
-  async create(@Body() createUserDto: CreateUserDto, @Session() session) {
-    if (session.user) {
-      // the user is already login
-      return new UnauthorizedException('User already exist');
-    }
-    createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+  @UsePipes(ValidationPipe)
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @Session() session: Record<string, unknown>,
+    @Res() response: Response,
+  ) {
     const user = await this.usersService.create(createUserDto);
-    if (user instanceof InternalServerErrorException) {
-      return user;
+    if (user.status !== 201) {
+      return response.status(user.status).send(user);
     }
     this.eventEmitter.emit(events.USER_CREATED, session, 'user', user);
-    return user;
+    return response
+      .status(user.status)
+      .cookie('token', user.data.token, {
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+      })
+      .send({
+        message: user.message,
+        status: user.status,
+        data: {
+          id: user.data._id,
+          username: user.data.username,
+          token: user.data.token,
+          email: user.data.email,
+        },
+      });
   }
 
   @Get()
@@ -101,8 +116,9 @@ export default class UsersController {
     description: "the server can't find the requested resource.",
     type: NotFoundException,
   })
-  findAll() {
-    return this.usersService.findAllUsers();
+  async findAll(@Res() response: Response) {
+    const users = await this.usersService.findAllUsers();
+    return response.status(users.status).send(users);
   }
 
   @Get('/all-available-perms')
@@ -125,8 +141,22 @@ export default class UsersController {
     description: "the server can't find the requested resource.",
     type: NotFoundException,
   })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id') id: string, @Res() response: Response) {
+    const user = await this.usersService.findOne(id);
+    if (user.status !== 200) {
+      return response.status(user.status).send(user);
+    }
+    return response.status(user.status).send({
+      message: user.message,
+      status: user.status,
+      data: {
+        id: user.data._id,
+        username: user.data.username,
+        email: user.data.email,
+        createdAt: user.data['createdAt'],
+        updatedAt: user.data['updatedAt'],
+      },
+    });
   }
 
   @Patch(':id')
@@ -141,12 +171,18 @@ export default class UsersController {
       'the server encountered an unexpected condition that prevented it from fulfilling the request.',
     type: InternalServerErrorException,
   })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Session() session: Record<string, unknown>,
+    @Res() response: Response,
   ) {
-    return this.usersService.update(id, updateUserDto, session);
+    const updatedUser = await this.usersService.update(
+      id,
+      updateUserDto,
+      session,
+    );
+    return response.status(updatedUser.status).send(updatedUser);
   }
 
   @Delete(':id')
@@ -166,14 +202,15 @@ export default class UsersController {
     description: "the server can't find the requested resource.",
     type: NotFoundException,
   })
-  remove(
+  async remove(
     @Param('userId') userId: string,
     @Session() session: Record<string, unknown>,
+    @Res() response: Response,
   ) {
-    const result = this.usersService.remove(userId, session);
+    const result = await this.usersService.remove(userId, session);
     this.eventEmitter.emit(events.USER_DELETED, userId);
     this.eventEmitter.emit(events.USER_LOGOUT, session);
-    return result;
+    return response.status(result.status).send(result);
   }
 
   @Post('/:userId/add-perms')
@@ -195,21 +232,18 @@ export default class UsersController {
     @Param('userId', MongooseObjectIdPipe) userId: string,
     @Body('perms', UserPermissionPipe) perms: string,
     @Session() session: Record<string, unknown>,
+    @Res() response: Response,
   ) {
     /** L'injection de dependances (du module user) dans le module admin ne fonctionne pas
         raison pour laquelle je doit utiliser ici le service d'administration
     */
-    const result = await new PermissionsService().addUserPerms(
-      perms,
-      userId,
-      this.usersModel,
-    );
+    const result = await this.usersService.addUserPerms(perms, userId);
     this.eventEmitter.emit(
       events.USER_PERMISSION_CHANGE,
       session,
       result['permissions'],
     );
-    return result;
+    return response.status(result.status).send(result);
   }
 
   @UseGuards(AdminAuthenticationGuard)
@@ -231,21 +265,18 @@ export default class UsersController {
     @Param('userId', MongooseObjectIdPipe) userId: string,
     @Body('perms', UserPermissionPipe) perms: string,
     @Session() session: Record<string, unknown>,
+    @Res() response: Response,
   ) {
     /** L'injection de dependances (du module user) dans le module admin ne fonctionne pas
         raison pour laquelle je doit utiliser ici le service d'administration 
     */
-    const result = await new PermissionsService().removeUserPerms(
-      perms,
-      userId,
-      this.usersModel,
-    );
+    const result = await this.usersService.removeUserPerms(perms, userId);
     this.eventEmitter.emit(
       events.USER_PERMISSION_CHANGE,
       session,
       result['permissions'],
     );
-    return result;
+    return response.status(result.status).send(result);
   }
 
   @UseGuards(UserAuthenticationGuard)
@@ -273,8 +304,14 @@ export default class UsersController {
     @Body('userId') userId: string,
     @Body('storeId') storeId: string,
     @Session() session: Record<string, unknown>,
+    @Res() response: Response,
   ) {
-    return await this.usersService.addSubscription(userId, storeId, session);
+    const subscribed = await this.usersService.addSubscription(
+      userId,
+      storeId,
+      session,
+    );
+    return response.status(subscribed.status).send(subscribed);
   }
 
   @UseGuards(UserAuthenticationGuard)
@@ -302,7 +339,13 @@ export default class UsersController {
     @Body('userId') userId: string,
     @Body('storeId') storeId: string,
     @Session() session: Record<string, unknown>,
+    @Res() response: Response,
   ) {
-    return await this.usersService.removeSubscription(userId, storeId, session);
+    const unsubscribed = await this.usersService.removeSubscription(
+      userId,
+      storeId,
+      session,
+    );
+    return response.status(unsubscribed.status).send(unsubscribed);
   }
 }
