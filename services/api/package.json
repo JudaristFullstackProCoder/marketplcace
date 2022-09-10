@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "set NODE_ENV=development && nest start",
     "start:dev": "nest start --watch",
+    "start:dev:hmr": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "set NODE_ENV=production && node dist/main",
@@ -59,9 +60,12 @@
     "object.omit": "^3.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
+    "run-script-webpack-plugin": "^0.1.1",
     "rxjs": "^7.2.0",
     "swagger-ui-express": "^4.4.0",
-    "systeminformation": "^5.11.22"
+    "systeminformation": "^5.11.22",
+    "webpack": "^5.74.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
