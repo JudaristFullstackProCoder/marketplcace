@@ -15,7 +15,6 @@ import { CartsModule } from './carts/carts.module';
 import { VariationsModule } from './variations/variations.module';
 import { FamiliesModule } from './families/families.module';
 import { CategoriesModule } from './categories/categories.module';
-import { SessionService } from './services/session/session.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ShopkeepersModule } from './shopkeepers/shopkeepers.module';
 import { AuthModule } from './auth/auth.module';
@@ -23,15 +22,15 @@ import { AuthController } from './auth/auth.controller';
 import { CommentsModule } from './comments/comments.module';
 import setEnv from '../app.env';
 
-// setEnv();
+setEnv();
 
-console.log(process.env.MONGODB_URL);
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.MONGODB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       family: 4,
+      dbName: process.env.DBNAME,
       authSource: 'admin',
       auth: {
         username: process.env.MONGODB_USER,
@@ -64,6 +63,6 @@ console.log(process.env.MONGODB_URL);
     CommentsModule,
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, SessionService],
+  providers: [AppService],
 })
 export class AppModule {}
