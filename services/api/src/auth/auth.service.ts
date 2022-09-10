@@ -12,7 +12,6 @@ import {
   SUPER_ADMIN_EMAIL_HASH,
   SUPER_ADMIN_PASSWORD_HASH,
 } from '../superadmin/credentials';
-import { formatUserDocument } from '../users/user.transformer';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +35,7 @@ export class AuthService {
       if (!auth) {
         return new UnauthorizedException('Invalid Credentials');
       }
-      return formatUserDocument(user);
+      return user;
     } catch (e) {
       return new InternalServerErrorException(e);
     }
