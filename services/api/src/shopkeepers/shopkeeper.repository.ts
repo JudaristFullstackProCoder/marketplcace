@@ -8,7 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateShopkeeperDto } from './dto/create-shopkeeper.dto';
 import { Shopkeeper, ShopkeeperDocument } from './entities/shopkeeper.entity';
-import { remove__v_shopkeeper } from './shopkeeper.transformer';
 
 @Injectable()
 export class ShopkeeperRepository {
@@ -16,52 +15,76 @@ export class ShopkeeperRepository {
     @InjectModel('shopkeepers')
     readonly shopkeeperModel: Model<ShopkeeperDocument>,
   ) {}
-  async addShopkeeper(
-    user: CreateShopkeeperDto,
-  ): Promise<Shopkeeper | InternalServerErrorException> {
+  async addShopkeeper(user: CreateShopkeeperDto) {
     try {
-      return await new this.shopkeeperModel(user).save();
+      const shopkeeper = await new this.shopkeeperModel(user).save();
+      return {
+        message: 'operation performed successfully',
+        status: 200,
+        data: { ...shopkeeper },
+      };
     } catch (e) {
-      return new InternalServerErrorException(e);
+      return {
+        message: e.message,
+        status: 500,
+        data: { ...e },
+      };
     }
   }
   async deleteShopkeeper(id: string) {
     try {
-      return (
-        (await this.shopkeeperModel.findByIdAndDelete(id)) ??
-        new BadRequestException()
-      );
+      const deleted = await this.shopkeeperModel.findByIdAndDelete(id);
+      return {
+        message: 'operation performed successfully',
+        status: 200,
+        data: {},
+      };
     } catch (e) {
-      return new InternalServerErrorException(e);
+      return {
+        message: e.message,
+        status: 500,
+        data: { ...e },
+      };
     }
   }
-  async getShopkeeperItem(
-    id: string,
-  ): Promise<
-    ShopkeeperDocument | InternalServerErrorException | NotFoundException
-  > {
+  async getShopkeeperById(id: string) {
     try {
-      const user = await this.shopkeeperModel.findById(id);
-      if (!(user instanceof BadRequestException)) {
-        if (!user) {
-          return new NotFoundException();
-        }
+      const shopkeeper = await this.shopkeeperModel.findById(id);
+      if (!shopkeeper) {
+        return {
+          message: 'not found',
+          status: 404,
+          data: {},
+        };
       }
-      return remove__v_shopkeeper(user);
+      return {
+        message: 'operation performed successfully',
+        status: 200,
+        data: { ...shopkeeper },
+      };
     } catch (e) {
-      return new InternalServerErrorException(e);
+      return {
+        message: e.message,
+        status: 500,
+        data: { ...e },
+      };
     }
   }
 
-  async getAllShopkeepers(): Promise<
-    NotFoundException | InternalServerErrorException | ShopkeeperDocument[]
-  > {
+  async getAllShopkeepers() {
     try {
-      return (await this.shopkeeperModel.find()).map((e) =>
-        remove__v_shopkeeper(e),
-      );
+      const result = await this.shopkeeperModel.find();
+      return {
+        message: 'operation performed successfully',
+        status: 200,
+        data: result,
+      };
     } catch (e) {
-      return new InternalServerErrorException(e);
+      return {
+        message: e.message,
+        status: 500,
+        data: { ...e },
+      };
     }
   }
 

@@ -19,6 +19,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import { MongooseObjectIdPipe } from '../utils/pipes/mongooseObjectId.pipe';
@@ -42,7 +43,6 @@ import {
   PERMS_ADD_SHOPKEEPER_PERMISSION,
   PERMS_REMOVE_SHOPKEEPER_PERMISSION,
 } from '../auth/perms/admin';
-import { PermissionsService } from '../services/permissions/permissions';
 import { SHOPKEEPER_PERMISSION_CHANGE } from '../events/app.events';
 import { InjectModel } from '@nestjs/mongoose';
 import { RemoveShopkeeperPerms } from './dto/remove-shopkeeper-perms.dto';
@@ -160,21 +160,24 @@ export class ShopkeepersController {
       'the server encountered an unexpected condition that prevented it from fulfilling the request.',
     type: InternalServerErrorException,
   })
+  @ApiParam({
+    name: 'shopkeeperId',
+    required: true,
+  })
   @UseGuards(AdminAuthenticationGuard)
   @Permissions(PERMS_ADD_SHOPKEEPER_PERMISSION)
   @UseGuards(AdminPermissionsGuard)
   async addUserPermission(
-    @Param('userId', MongooseObjectIdPipe) userId: string,
+    @Param('shopkeeperId', MongooseObjectIdPipe) shopkeeperId: string,
     @Body('perms', ShopkeeperPermissionPipe) perms: string,
     @Session() session: Record<string, unknown>,
   ) {
     /** L'injection de dependances (du module user) dans le module admin ne fonctionne pas
         raison pour laquelle je doit utiliser ici le service d'administration
     */
-    const result = await new PermissionsService().addShopkeeperPerms(
+    const result = await this.shopkeepersService.addShopkeeperPerms(
       perms,
-      userId,
-      this.shopkeeperModel,
+      shopkeeperId,
     );
     this.eventEmitter.emit(
       SHOPKEEPER_PERMISSION_CHANGE,
@@ -188,6 +191,10 @@ export class ShopkeepersController {
   @Permissions(PERMS_REMOVE_SHOPKEEPER_PERMISSION)
   @UseGuards(PermissionsGuard)
   @Post('/:shopkeeperId/remove-perms')
+  @ApiParam({
+    name: 'shopkeeperId',
+    required: true,
+  })
   @ApiBody({
     description: 'the permission (in camel case)',
     required: true,
@@ -200,17 +207,16 @@ export class ShopkeepersController {
     type: InternalServerErrorException,
   })
   async removeUserPermission(
-    @Param('userId', MongooseObjectIdPipe) userId: string,
+    @Param('shopkeeperId', MongooseObjectIdPipe) shopkeeperId: string,
     @Body('perms', ShopkeeperPermissionPipe) perms: string,
     @Session() session: Record<string, unknown>,
   ) {
     /** L'injection de dependances (du module user) dans le module admin ne fonctionne pas
         raison pour laquelle je doit utiliser ici le service d'administration 
     */
-    const result = await new PermissionsService().removeShopkeeperPerms(
+    const result = this.shopkeepersService.removeShopkeeperPerms(
       perms,
-      userId,
-      this.shopkeeperModel,
+      shopkeeperId,
     );
     this.eventEmitter.emit(
       SHOPKEEPER_PERMISSION_CHANGE,
