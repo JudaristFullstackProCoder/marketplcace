@@ -8,12 +8,22 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import UsersRepository from './users.repository';
+import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UsersService {
   constructor(@Inject(UsersRepository) private repository: UsersRepository) {}
-  create(user: CreateUserDto) {
-    return this.repository.addUser(user);
+  async create(createUserDto: CreateUserDto) {
+    if (createUserDto.password) {
+      createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+    }
+    createUserDto['token'] = await bcrypt.hash(
+      JSON.stringify(createUserDto) + new Date().toISOString(),
+      10,
+    );
+    const response = this.repository.addUser(createUserDto);
+    return response;
   }
 
   findAllUsers() {
@@ -78,13 +88,76 @@ export class UsersService {
         return product;
       }
       if (userId !== session.user['_id']) {
-        return new UnauthorizedException(
-          'Sorry, you are not the owner of this resource',
-        );
+        return {
+          message: 'Sorry, you are not the owner of this resource',
+          status: 401,
+          data: {},
+        };
       }
       return true;
     } catch (e) {
-      return new InternalServerErrorException(e);
+      return {
+        message: 'Sorry, you are not the owner of this resource',
+        status: 401,
+        data: { ...e },
+      };
     }
+  }
+
+  private async updateUserPermissions(
+    userId: string,
+    userNewPermissions: Record<string, unknown>,
+    model: Model<string>,
+  ) {
+    try {
+      const update = await model
+        .findByIdAndUpdate(userId, {
+          permissions: userNewPermissions,
+        })
+        .exec();
+      return {
+        message: 'operation performed successfully',
+        status: 200,
+        data: {},
+      };
+    } catch (e) {
+      return {
+        message: e.message,
+        status: 500,
+        data: { ...e },
+      };
+    }
+  }
+
+  async addUserPerms(userPerms: any, userId: string) {
+    const user = await this.repository.getUserById(userId);
+    if (user.status !== 200) {
+      return user;
+    }
+    user.data.permissions[0][userPerms] = userPerms;
+    return this.updateUserPermissions(
+      userId,
+      // @ts-ignore
+      user.data.permissions,
+      this.repository.getModel(),
+    );
+  }
+
+  async removeUserPerms(userPerms: any, userId: string) {
+    const user = await this.repository.getUserById(userId);
+    if (user.status !== 200) {
+      return user;
+    }
+    user.data.permissions[0][userPerms] = false;
+    //@ts-ignore
+    return this.updateUserPermissions(userId, user.data.permissions, model);
+  }
+
+  async addShopkeeperPerms(userPerms: any, userId: string) {
+    return this.addUserPerms(userPerms, userId);
+  }
+
+  async removeShopkeeperPerms(userPerms: any, userId: string) {
+    this.removeUserPerms(userPerms, userId);
   }
 }
