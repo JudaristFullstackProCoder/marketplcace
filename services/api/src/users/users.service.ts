@@ -81,6 +81,13 @@ export class UsersService {
   async checkOwnerShip(userId: string, session: Record<string, unknown>) {
     try {
       const product = await this.repository.getUserById(userId);
+      if (product.status !== 200) {
+        return {
+          message: 'Sorry, you are not the owner of this resource',
+          status: 500,
+          data: {},
+        };
+      }
       if (
         product instanceof InternalServerErrorException ||
         product instanceof NotFoundException
@@ -151,13 +158,5 @@ export class UsersService {
     user.data.permissions[0][userPerms] = false;
     //@ts-ignore
     return this.updateUserPermissions(userId, user.data.permissions, model);
-  }
-
-  async addShopkeeperPerms(userPerms: any, userId: string) {
-    return this.addUserPerms(userPerms, userId);
-  }
-
-  async removeShopkeeperPerms(userPerms: any, userId: string) {
-    this.removeUserPerms(userPerms, userId);
   }
 }
