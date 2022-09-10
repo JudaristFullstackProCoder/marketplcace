@@ -17,7 +17,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  async getHello(): Promise<string> {
+  getHello(): Record<string, unknown> {
     return this.appService.getHello();
   }
 
