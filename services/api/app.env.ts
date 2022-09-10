@@ -10,5 +10,7 @@ export default function setEnv() {
 
   process.env.APP_PORT = '5000';
 
-  process.env.MONGODB_URL = 'mongodb://localhost:27017/marketplace';
+  process.env.MONGODB_URL = 'mongodb://localhost:27017/';
+
+  process.env.DBNAME = 'marketplace';
 }
