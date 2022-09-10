@@ -5,6 +5,8 @@ import * as session from 'express-session';
 import helmet from 'helmet';
 import { ValidationPipe } from '@nestjs/common';
 
+declare const module: any;
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(
@@ -18,7 +20,11 @@ async function bootstrap() {
   app.enableCors({
     origin: process.env.CORS_ORIGIN,
   });
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
   const config = new DocumentBuilder()
     .setTitle('Marketplace API Documentation')
     .setDescription('This is a marketplace api')
@@ -27,5 +33,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(process.env.OPEN_API_PATH, app, document);
   await app.listen(parseInt(process.env.APP_PORT));
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 bootstrap();
