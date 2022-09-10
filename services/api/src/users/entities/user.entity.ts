@@ -44,6 +44,8 @@ export class User {
     ref: 'stores',
   })
   subscriptions: string[];
+  @Prop({ type: mongoose.Schema.Types.String, required: true })
+  token: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
