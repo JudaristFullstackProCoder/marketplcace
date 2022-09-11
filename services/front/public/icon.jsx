@@ -1,6 +1,6 @@
 export default function IconLogto() {
   return (
-    <svg width="104" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M0 7.282c0-1.14.924-2.065 2.065-2.065h20.13c1.14 0 2.064.924 2.064 2.065V28.96c0 1.14-.924 2.065-2.064 2.065H2.065A2.065 2.065 0 0 1 0 28.96V7.282Z"
         fill="url('#paint0_linear_2731_5482')"

@@ -18,6 +18,8 @@ import {
 
 import IconLogto from "../public/icon";
 
+import { IconSearch } from "@tabler/icons";
+
 import {
   Home24Regular,
   StoreMicrosoft24Regular,
@@ -32,7 +34,7 @@ import {
 import { IconUserCircle } from "@tabler/icons";
 
 import ToggleTheme from "../components/theme/toogleTheme";
-import { openModal } from "@mantine/modals";
+import { openModal, closeAllModals } from "@mantine/modals";
 import Login from "../components/app/login";
 
 export default function Index() {
@@ -134,37 +136,47 @@ export default function Index() {
       }
       header={
         <Header height={70}>
-          <Group position="apart">
+          <Group position="apart" my={"sm"}>
             <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-              <Burger
-                opened={opened}
-                onClick={() => setOpened((o) => !o)}
-                size="sm"
-                color={theme.colors.gray[6]}
-                mr="xl"
-              />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Burger
+                  opened={opened}
+                  onClick={() => setOpened((o) => !o)}
+                  size="sm"
+                  color={theme.colors.gray[6]}
+                  mr="xl"
+                />
+                <IconLogto />
+              </div>
             </MediaQuery>
+            {/* <IconLogto /> */}
             <Group
-              grow
-              p={"md"}
-              position={"apart"}
               sx={(theme) => ({
-                paddingLeft: "10px",
-                [theme.fn.smallerThan("sm")]: {
+                [theme.fn.largerThan("xl")]: {
                   display: "none",
                 },
               })}
             >
-              <IconLogto />
+              <IconSearch />
             </Group>
-            <div>
-              <TextInput
-                placeholder="search"
-                icon={<Search24Regular filled={"true"} primaryFill="blue" />}
-                size="sm"
-                sx={{ width: "45vw" }}
-              />
-            </div>
+            <TextInput
+              placeholder="search"
+              icon={<Search24Regular filled={"true"} primaryFill="blue" />}
+              size="sm"
+              sx={(theme) => ({
+                width: "45vw",
+                [theme.fn.smallerThan("xl")]: {
+                  display: "none",
+                },
+              })}
+            />
             <Group sx={{ paddingRight: "10px" }} grow={false}>
               <Button
                 leftIcon={<IconUserCircle />}
