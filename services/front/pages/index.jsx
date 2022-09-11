@@ -32,6 +32,8 @@ import {
 import { IconUserCircle } from "@tabler/icons";
 
 import ToggleTheme from "../components/theme/toogleTheme";
+import { openModal } from "@mantine/modals";
+import Login from "../components/app/login";
 
 export default function Index() {
   const theme = useMantineTheme();
@@ -169,6 +171,15 @@ export default function Index() {
                 variant="outline"
                 size="xs"
                 color="gray"
+                onClick={() => {
+                  openModal({
+                    children: (
+                      <>
+                        <Login />
+                      </>
+                    ),
+                  });
+                }}
               >
                 Login
               </Button>

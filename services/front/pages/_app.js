@@ -3,6 +3,7 @@ import usePersistentState from "../hooks/usePersistState";
 import store from "store";
 import { useEffect, useState } from "react";
 import RouterTransition from "../components/app/routerTransition";
+import { ModalsProvider } from "@mantine/modals";
 
 export function useTheme() {
   const [theme, setTheme] = usePersistentState(
@@ -29,11 +30,16 @@ function MyApp({ Component, pageProps }) {
       withNormalizeCSS
       theme={{ colorScheme: themeColor }}
     >
-      <RouterTransition />
-      {pageLoaded ? (
-        <Component {...pageProps} themeColor={themeColor} setTheme={setTheme} />
-      ) : null}
-      ;
+      <ModalsProvider>
+        <RouterTransition />
+        {pageLoaded ? (
+          <Component
+            {...pageProps}
+            themeColor={themeColor}
+            setTheme={setTheme}
+          />
+        ) : null}
+      </ModalsProvider>
     </MantineProvider>
   );
 }
