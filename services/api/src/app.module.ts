@@ -22,7 +22,7 @@ import { AuthController } from './auth/auth.controller';
 import { CommentsModule } from './comments/comments.module';
 import setEnv from '../app.env';
 
-setEnv();
+//setEnv();
 
 @Module({
   imports: [
