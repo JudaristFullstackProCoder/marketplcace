@@ -1,8 +1,16 @@
 import { MantineProvider } from "@mantine/core";
-import { ColorSchemeProvider } from "@mantine/core";
 import usePersistentState from "../hooks/usePersistState";
 import store from "store";
 import { useEffect, useState } from "react";
+import RouterTransition from "../components/app/routerTransition";
+
+export function useTheme() {
+  const [theme, setTheme] = usePersistentState(
+    "theme",
+    store.get("theme") ?? "light"
+  );
+  return [theme, setTheme];
+}
 
 function MyApp({ Component, pageProps }) {
   const [themeColor, setTheme] = usePersistentState(
@@ -16,24 +24,17 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <ColorSchemeProvider>
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{
-          colorScheme: themeColor,
-        }}
-      >
-        {pageLoaded ? (
-          <Component
-            {...pageProps}
-            themeColor={themeColor}
-            setTheme={setTheme}
-          />
-        ) : null}
-        ;
-      </MantineProvider>
-    </ColorSchemeProvider>
+    <MantineProvider
+      withGlobalStyles
+      withNormalizeCSS
+      theme={{ colorScheme: themeColor }}
+    >
+      <RouterTransition />
+      {pageLoaded ? (
+        <Component {...pageProps} themeColor={themeColor} setTheme={setTheme} />
+      ) : null}
+      ;
+    </MantineProvider>
   );
 }
 

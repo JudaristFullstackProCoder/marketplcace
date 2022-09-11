@@ -13,7 +13,10 @@ import {
   Divider,
   TextInput,
   Group,
+  Button,
 } from "@mantine/core";
+
+import IconLogto from "../public/icon";
 
 import {
   Home24Regular,
@@ -23,9 +26,12 @@ import {
   PeopleSettings24Regular,
   Person24Regular,
   PersonBoard24Regular,
-  ShoppingBag24Regular,
   Search24Regular,
 } from "@fluentui/react-icons";
+
+import { IconUserCircle } from "@tabler/icons";
+
+import ToggleTheme from "../components/theme/toogleTheme";
 
 export default function Index() {
   const theme = useMantineTheme();
@@ -52,7 +58,6 @@ export default function Index() {
           <Navbar.Section
             grow
             component={ScrollArea}
-            fixed={false}
             position={{ top: 0, left: 0 }}
           >
             <NavLink
@@ -127,7 +132,7 @@ export default function Index() {
       }
       header={
         <Header height={70}>
-          <Group position="apart" spacing="xs" p="md">
+          <Group position="apart">
             <MediaQuery largerThan="sm" styles={{ display: "none" }}>
               <Burger
                 opened={opened}
@@ -138,25 +143,37 @@ export default function Index() {
               />
             </MediaQuery>
             <Group
+              grow
+              p={"md"}
+              position={"apart"}
               sx={(theme) => ({
+                paddingLeft: "10px",
                 [theme.fn.smallerThan("sm")]: {
                   display: "none",
                 },
               })}
             >
-              <ShoppingBag24Regular />
+              <IconLogto />
             </Group>
-            <span>
+            <div>
               <TextInput
                 placeholder="search"
-                icon={<Search24Regular filled={true} primaryFill="blue" />}
+                icon={<Search24Regular filled={"true"} primaryFill="blue" />}
                 size="sm"
-                sx={{ width: "47vw" }}
+                sx={{ width: "45vw" }}
               />
-            </span>
-            <span>
-              <ShoppingBag24Regular />{" "}
-            </span>
+            </div>
+            <Group sx={{ paddingRight: "10px" }} grow={false}>
+              <Button
+                leftIcon={<IconUserCircle />}
+                variant="outline"
+                size="xs"
+                color="gray"
+              >
+                Login
+              </Button>
+              <ToggleTheme />
+            </Group>
           </Group>
         </Header>
       }
