@@ -2,7 +2,6 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import UsersRepository from '../users/users.repository';
@@ -29,15 +28,31 @@ export class AuthService {
         })
         .exec();
       if (!user) {
-        return new NotFoundException('This email is not liked to any account');
+        return {
+          message: 'This email is not liked to any account',
+          status: 400,
+          data: {
+            keys: ['email'],
+          },
+        };
       }
       const auth = await bcrypt.compare(password, user.password);
       if (!auth) {
-        return new UnauthorizedException('Invalid Credentials');
+        return {
+          message: 'Invalid credentials',
+          status: 400,
+          data: {
+            keys: ['email', 'password'],
+          },
+        };
       }
       return user;
     } catch (e) {
-      return new InternalServerErrorException(e);
+      return {
+        message: e.message,
+        status: 400,
+        data: { ...e },
+      };
     }
   }
 
@@ -50,15 +65,31 @@ export class AuthService {
         })
         .exec();
       if (!admin) {
-        return new NotFoundException('This email is not liked to any account');
+        return {
+          message: 'this email is not linked to any account',
+          status: 400,
+          data: {},
+        };
       }
       const auth = await bcrypt.compare(password, admin.password);
       if (!auth) {
-        return new UnauthorizedException('Invalid Credentials');
+        return {
+          message: 'invalid credentials',
+          status: 400,
+          data: {},
+        };
       }
-      return [{ admin_id: admin._id, login: true }, admin];
+      return {
+        message: 'ok',
+        status: 200,
+        data: {},
+      };
     } catch (e) {
-      return new InternalServerErrorException(e);
+      return {
+        message: e.message,
+        status: 500,
+        data: {},
+      };
     }
   }
 

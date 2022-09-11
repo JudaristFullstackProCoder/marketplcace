@@ -94,7 +94,7 @@ export class UsersService {
       ) {
         return product;
       }
-      if (userId !== session.user['_id']) {
+      if (userId !== session.user['id']) {
         return {
           message: 'Sorry, you are not the owner of this resource',
           status: 401,
@@ -117,7 +117,7 @@ export class UsersService {
     model: Model<string>,
   ) {
     try {
-      const update = await model
+      await model
         .findByIdAndUpdate(userId, {
           permissions: userNewPermissions,
         })
