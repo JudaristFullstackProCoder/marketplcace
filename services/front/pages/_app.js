@@ -2,12 +2,19 @@ import { MantineProvider } from "@mantine/core";
 import { ColorSchemeProvider } from "@mantine/core";
 import usePersistentState from "../hooks/usePersistState";
 import store from "store";
+import { useEffect, useState } from "react";
 
 function MyApp({ Component, pageProps }) {
   const [themeColor, setTheme] = usePersistentState(
     "theme",
     store.get("theme") ?? "light"
   );
+  const [pageLoaded, setPageLoaded] = useState(false);
+
+  useEffect(() => {
+    setPageLoaded(true);
+  }, []);
+
   return (
     <ColorSchemeProvider>
       <MantineProvider
@@ -17,7 +24,13 @@ function MyApp({ Component, pageProps }) {
           colorScheme: themeColor,
         }}
       >
-        <Component {...pageProps} themeColor={themeColor} setTheme={setTheme} />
+        {pageLoaded ? (
+          <Component
+            {...pageProps}
+            themeColor={themeColor}
+            setTheme={setTheme}
+          />
+        ) : null}
         ;
       </MantineProvider>
     </ColorSchemeProvider>
