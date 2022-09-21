@@ -3,6 +3,9 @@
 /node_modules
 /public/node_modules
 
+# Docker databases files
+/db
+
 # Logs
 logs
 *.log
