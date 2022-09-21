@@ -1,6 +1,6 @@
 FROM node:16.17.0-alpine3.15
 ARG env=dev
-EXPOSE 5000
+EXPOSE 8000
 WORKDIR /app
 VOLUME ./:./
 COPY ./package.json ./

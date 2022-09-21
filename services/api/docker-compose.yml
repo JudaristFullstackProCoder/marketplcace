@@ -30,6 +30,46 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: p9Y38w01811GjH8QXm
       MONGO_INITDB_DATABASE: marketplace
     volumes:
-      - ./db:/data/db/
+      - ./db/mongo:/data/db/
+  logto:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    image: svhd/logto:prerelease
+    ports:
+      - 3001:3001
+    networks:
+      - marketplace
+    environment:
+      - ALL_YES=1
+      - NO_INQUIRY=0
+      - TRUST_PROXY_HEADER=1
+      - DB_URL_DEFAULT=postgres://postgres:p0stgr3s@postgres:5432
+      - ENDPOINT
+  postgres:
+    image: postgres:14-alpine
+    user: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: p0stgr3s
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marketplace
+    volumes:
+      - ./db/postgres:/var/lib/postgresql/data
+  frontend:
+    restart: always
+    command: yarn run dev
+    build:
+      context: ../front
+      dockerfile: ./Dockerfile
+    networks:
+      - marketplace
+    ports:
+      - '8000:8000'
 networks:
   marketplace:
