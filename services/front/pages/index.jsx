@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AppShell,
   Navbar,
@@ -31,14 +31,25 @@ import {
   Search24Regular,
 } from "@fluentui/react-icons";
 
+import apiEndpoints from "../config/api";
+
 import { IconUserCircle } from "@tabler/icons";
 
 import ToggleTheme from "../components/theme/toogleTheme";
 import { openModal, closeAllModals } from "@mantine/modals";
 import Login from "../components/app/login";
+import * as axios from "axios";
 
 export default function Index() {
   const theme = useMantineTheme();
+  const [session, setSession] = useState({});
+  useEffect(() => {
+    const fetchData = async () => {
+      const session = await (await axios.default.get(apiEndpoints.home)).data;
+      return session;
+    };
+    setSession(fetchData());
+  }, []);
   const [opened, setOpened] = useState(false);
   return (
     <AppShell
@@ -137,7 +148,7 @@ export default function Index() {
       header={
         <Header height={70}>
           <Group position="apart" my={"sm"}>
-            <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+            <MediaQuery largerThan="sm">
               <div
                 style={{
                   display: "flex",
@@ -152,8 +163,15 @@ export default function Index() {
                   size="sm"
                   color={theme.colors.gray[6]}
                   mr="xl"
+                  sx={(theme) =>({
+                    [theme.fn.largerThan('sm')]: {
+                      display: "none",
+                    }
+                  })}
                 />
-                <IconLogto />
+                <div style={{
+                  paddingLeft: "15px"
+                }}><IconLogto /></div>
               </div>
             </MediaQuery>
             {/* <IconLogto /> */}

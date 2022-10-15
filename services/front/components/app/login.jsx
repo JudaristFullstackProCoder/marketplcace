@@ -8,14 +8,39 @@ import {
   Group,
   Button,
 } from "@mantine/core";
+import endpoints from '../../config/api';
+import { useForm } from "react-hook-form";
 
 import { openModal, closeAllModals } from "@mantine/modals";
 
 import SignUp from "./signup";
+import axios from "axios";
+import Router from "next/router";
 
 export default function Login() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+  } = useForm({
+        mode: "onChange",
+  });
+
+  console.log(errors, isSubmitting, isValid);
+
+  const onSubmit = async data => {
+    const response = await (await axios.post(endpoints.userLogin, {
+      ...data
+    })).data;
+    if (response?.data?.token) {
+      Router.reload();
+    } else {
+      //
+    }
+  }
+
   return (
-    <body>
+    <form onSubmit={handleSubmit(onSubmit, (errors) => console.log(errors))}>
       <Container mt={5}>
         {" "}
         <Title
@@ -53,12 +78,26 @@ export default function Login() {
           </Anchor>
         </Text>
 
-        <TextInput label="Email" placeholder="you@mantine.dev" required />
+        <TextInput
+          label="Phone number"
+          {...register("phonenumber", {
+            required: true,
+          })}
+          disabled={isSubmitting}
+          error={errors['phonenumber']?true:false}
+          placeholder="+237 111 111 111"
+          required
+        />
         <PasswordInput
           label="Password"
+          error={errors['password']?true:false}
           placeholder="Your password"
           required
           mt="md"
+          {...register("password", {
+            required: true,
+          })}
+          disabled={isSubmitting}
         />
         <Group position="apart" mt="md">
           <Anchor
@@ -69,10 +108,10 @@ export default function Login() {
             Forgot password?
           </Anchor>
         </Group>
-        <Button fullWidth mt="xl">
+        <Button type="submit" disabled={isSubmitting || !isValid} fullWidth mt="xl">
           Sign in
         </Button>
       </Container>
-    </body>
+    </form>
   );
 }

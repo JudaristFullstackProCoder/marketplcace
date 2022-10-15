@@ -5,16 +5,40 @@ import {
   Title,
   Text,
   Container,
-  Group,
   Button,
 } from "@mantine/core";
 
+import endpoints from "../../config/api";
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import Router from "next/router";
 import { openModal, closeAllModals } from "@mantine/modals";
 import Login from "./login";
 
 export default function SignUp() {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm({
+    mode: "onChange",
+  });
+  const onSubmit = async (data) => {
+    const response = await (
+      await axios.post(endpoints.userSignUp, {
+        ...data,
+      })
+    ).data;
+    if (response?.data?.token) {
+      Router.reload();
+    } else {
+      //
+    }
+  };
+  console.log(errors, isValid, isSubmitting);
   return (
-    <body>
+    <form onSubmit={handleSubmit(onSubmit, (err) => console.log(err))}>
       <Container mt={5}>
         {" "}
         <Title
@@ -52,26 +76,41 @@ export default function SignUp() {
           </Anchor>
         </Text>
 
-        <Group position="apart" grow>
-          <TextInput label="Email" placeholder="youemail@gmail.com" required />
-          <TextInput label="Username" placeholder="John Doe" required />
-        </Group>
-        <PasswordInput
-          label="Password"
-          placeholder="Your password"
+        <TextInput
+          label="Phone number"
+          disabled={isSubmitting}
+          placeholder="+237 111 111 111"
+          {...register("phonenumber", {
+            required: true,
+          })}
+          error={errors['phonenumber']?true:false}
           required
-          mt="md"
+        />
+        <TextInput
+          label="name"
+          {...register("name", {
+            required: true,
+          })}
+          placeholder="John Doe"
+          required
+          disabled={isSubmitting}
+          error={errors['name']?true:false}
         />
         <PasswordInput
           label="Password"
           placeholder="Your password"
           required
+          disabled={isSubmitting}
+          error={errors['password']?true:false}
+          {...register("password", {
+            required: true,
+          })}
           mt="md"
         />
-        <Button fullWidth mt="xl">
+        <Button disabled={!isValid} loading={isSubmitting} type={"submit"} fullWidth mt="xl">
           Sign up
         </Button>
       </Container>
-    </body>
+    </form>
   );
 }
