@@ -4,7 +4,7 @@ export default function setEnv() {
 
   process.env.UPLOADS_FOLDER = '../uploads';
 
-  process.env.CORS_ORIGIN = 'http://localhost:3000';
+  process.env.CORS_ORIGIN = 'http://localhost:8000';
 
   process.env.OPEN_API_PATH = 'api';
 
