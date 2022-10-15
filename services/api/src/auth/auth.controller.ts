@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Post,
   Redirect,
+  Res,
   Session,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -17,12 +18,12 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 import {
   ADMIN_LOGIN,
   ADMIN_LOGOUT,
   SUPER_ADMIN_LOGIN,
   SUPER_ADMIN_LOGOUT,
-  USER_LOGIN,
   USER_LOGOUT,
 } from '../events/app.events';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -60,19 +61,29 @@ export class AuthController {
   })
   @Post('/user/login/')
   async loginUser(
-    @Body('email') email: string,
+    @Body('phonenumber') phonenumber: string,
     @Body('password') password: string,
     @Session() session: Record<string, any>,
+    @Res() response: Response,
   ) {
-    const login = await this.authService.loginUser(email, password);
-    if (
-      !(login instanceof InternalServerErrorException) &&
-      !(login instanceof NotFoundException) &&
-      !(login instanceof UnauthorizedException)
-    ) {
-      this.eventEmitter.emit(USER_LOGIN, session, login);
+    const login = await this.authService.loginUser(phonenumber, password);
+    if (login.status !== 200) {
+      //@ts-ignore
+      return response.status(login.status).send(login);
     }
-    return login;
+     session['user'] = login;
+     //@ts-ignore
+    return response.status(login.status)
+      .cookie('token', login.data.token, {
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+      })
+      .send({
+        message: login.message,
+        status: login.status,
+        data: {
+          ...login.data,
+        },
+      });
   }
 
   @HttpCode(200)

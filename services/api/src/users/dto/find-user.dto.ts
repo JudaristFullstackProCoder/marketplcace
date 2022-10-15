@@ -5,7 +5,7 @@ export class FindUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  username: string;
+  name: string;
   @ApiProperty()
   @IsEmail()
   email: string;

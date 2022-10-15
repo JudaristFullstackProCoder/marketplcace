@@ -80,7 +80,7 @@ export default class UsersController {
     if (user.status !== 201) {
       return response.status(user.status).send(user);
     }
-    this.eventEmitter.emit(events.USER_CREATED, session, 'user', user);
+    session['user'] = user;
     return response
       .status(user.status)
       .cookie('token', user.data.token, {
@@ -91,9 +91,9 @@ export default class UsersController {
         status: user.status,
         data: {
           id: user.data._id,
-          username: user.data.username,
+          name: user.data.name,
           token: user.data.token,
-          email: user.data.email,
+          phonenumber: user.data.phonenumber,
         },
       });
   }
@@ -151,8 +151,8 @@ export default class UsersController {
       status: user.status,
       data: {
         id: user.data._id,
-        username: user.data.username,
-        email: user.data.email,
+        name: user.data.name,
+        phonenumber: user.data.phonenumber,
         createdAt: user.data['createdAt'],
         updatedAt: user.data['updatedAt'],
       },
