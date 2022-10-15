@@ -2,9 +2,8 @@ FROM node:16.17.0-alpine3.15
 ARG env=dev
 EXPOSE 5000
 WORKDIR /app
-VOLUME ./:./
-COPY ./package.json ./
-RUN npm i -g yarn; exit 0
+VOLUME .:/app
+COPY ./package.json ./package.json
 RUN yarn install
-COPY ./yarn.lock ./
+COPY yarn.lock .
 COPY . .
