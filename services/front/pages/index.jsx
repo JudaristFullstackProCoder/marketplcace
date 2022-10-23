@@ -1,56 +1,109 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import {
   AppShell,
-  Navbar,
-  Header,
-  Text,
-  MediaQuery,
-  Burger,
-  useMantineTheme,
-  ScrollArea,
-  NavLink,
   Box,
-  Divider,
-  TextInput,
-  Group,
+  Burger,
   Button,
+  Divider,
+  Group,
+  Header,
+  MediaQuery,
+  Navbar,
+  NavLink,
+  ScrollArea,
+  Text,
+  TextInput,
+  useMantineTheme,
 } from "@mantine/core";
 
 import IconLogto from "../public/icon";
 
-import { IconSearch } from "@tabler/icons";
+import {IconSearch, IconUserCircle} from "@tabler/icons";
 
 import {
-  Home24Regular,
-  StoreMicrosoft24Regular,
-  Comment24Regular,
   BuildingShop24Regular,
+  Comment24Regular,
+  Home24Regular,
   PeopleSettings24Regular,
   Person24Regular,
   PersonBoard24Regular,
   Search24Regular,
+  StoreMicrosoft24Regular,
 } from "@fluentui/react-icons";
 
 import apiEndpoints from "../config/api";
 
-import { IconUserCircle } from "@tabler/icons";
-
 import ToggleTheme from "../components/theme/toogleTheme";
-import { openModal, closeAllModals } from "@mantine/modals";
+import {openModal} from "@mantine/modals";
 import Login from "../components/app/login";
 import * as axios from "axios";
+
+
+const NavBarDivider = ({text}) => <Divider
+    my="xs"
+    variant="solid"
+    labelPosition="center"
+    label={
+      <>
+        <Box ml={5}>{text}</Box>
+      </>
+    }
+/>
 
 export default function Index() {
   const theme = useMantineTheme();
   const [session, setSession] = useState({});
+
   useEffect(() => {
     const fetchData = async () => {
-      const session = await (await axios.default.get(apiEndpoints.home)).data;
-      return session;
+      return await (await axios.default.get(apiEndpoints.home)).data;
     };
     setSession(fetchData());
   }, []);
+
   const [opened, setOpened] = useState(false);
+
+  const bodyComponent = useState("");
+
+  const navLinks = [
+    {
+      label: "home",
+      variant: "light",
+      color: "blue",
+      description: "browse all products",
+      icon: <Home24Regular />
+    },{
+      label: "subscriptions",
+      variant: "light",
+      color: "blue",
+      description: "subscriptions",
+      icon: <StoreMicrosoft24Regular />
+    },{
+    label: "your store",
+    variant: "light",
+    color: "blue",
+    description: "manage your own store",
+    icon: <BuildingShop24Regular />
+  }]
+
+  const navLinks2 = [
+    {
+      label: "profile",
+      variant: "light",
+      color: "blue",
+      icon: <Person24Regular />
+    }, {
+    label: "settings",
+    variant: "light",
+    color: "blue",
+    icon: <PeopleSettings24Regular />
+  }, {
+    label: "dashboard",
+    variant: "light",
+    color: "blue",
+    icon: <PersonBoard24Regular />
+  }]
+
   return (
     <AppShell
       styles={{
@@ -69,71 +122,30 @@ export default function Index() {
           hidden={!opened}
           width={{ sm: 200, lg: 200 }}
         >
-          <Navbar.Section></Navbar.Section>
+
           <Navbar.Section
             grow
             component={ScrollArea}
             position={{ top: 0, left: 0 }}
           >
-            <NavLink
-              label="home"
-              variant="light"
-              color="blue"
-              description="browse all products"
-              icon={<Home24Regular />}
-            />
-            <NavLink
-              label="subscriptions"
-              variant="light"
-              color="blue"
-              description="subscriptions"
-              icon={<StoreMicrosoft24Regular />}
-            />
-            <NavLink
-              label="your store"
-              variant="light"
-              color="blue"
-              description="manage your own store"
-              icon={<BuildingShop24Regular />}
-            />
-            <Divider
-              my="xs"
-              variant="solid"
-              labelPosition="center"
-              label={
-                <>
-                  <Box ml={5}>account & settings</Box>
-                </>
-              }
-            />
-            <NavLink
-              label="profile"
-              variant="light"
-              color="blue"
-              icon={<Person24Regular />}
-            />
-            <NavLink
-              label="settings"
-              variant="light"
-              color="blue"
-              icon={<PeopleSettings24Regular />}
-            />
-            <NavLink
-              label="dashboard"
-              variant="light"
-              color="blue"
-              icon={<PersonBoard24Regular />}
-            />
-            <Divider
-              my="xs"
-              variant="solid"
-              labelPosition="center"
-              label={
-                <>
-                  <Box ml={5}>comment</Box>
-                </>
-              }
-            />
+            {navLinks.map(e => <NavLink
+                label={e?.label}
+                variant={e?.variant}
+                color={e?.color}
+                key={e.toString()}
+                description={e?.description}
+                icon={e.icon}
+            />)}
+            <NavBarDivider text="account & settings" />
+            {navLinks2.map(e => <NavLink
+                label={e?.label}
+                variant={e?.variant}
+                color={e?.color}
+                key={e.toString()}
+                description={e?.description}
+                icon={e.icon}
+            />)}
+            <NavBarDivider text="comment" />
             <NavLink
               label="write us"
               variant="light"
@@ -142,7 +154,6 @@ export default function Index() {
               icon={<Comment24Regular />}
             />
           </Navbar.Section>
-          <Navbar.Section></Navbar.Section>
         </Navbar>
       }
       header={
@@ -219,7 +230,7 @@ export default function Index() {
         </Header>
       }
     >
-      <Text></Text>
+      <Text>body…</Text>
     </AppShell>
   );
 }
