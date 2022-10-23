@@ -15,7 +15,6 @@ import { openModal, closeAllModals } from "@mantine/modals";
 
 import SignUp from "./signup";
 import axios from "axios";
-import Router from "next/router";
 
 export default function Login() {
   const {
@@ -26,14 +25,13 @@ export default function Login() {
         mode: "onChange",
   });
 
-  console.log(errors, isSubmitting, isValid);
-
   const onSubmit = async data => {
-    const response = await (await axios.post(endpoints.userLogin, {
-      ...data
-    })).data;
+    const response = (await axios.post(endpoints.userLogin, data, {
+      withCredentials: false,
+    })).data
+
     if (response?.data?.token) {
-      Router.reload();
+      // Router.reload();
     } else {
       //
     }
@@ -84,13 +82,13 @@ export default function Login() {
             required: true,
           })}
           disabled={isSubmitting}
-          error={errors['phonenumber']?true:false}
+          error={!!errors['phonenumber']}
           placeholder="+237 111 111 111"
           required
         />
         <PasswordInput
           label="Password"
-          error={errors['password']?true:false}
+          error={!!errors['password']}
           placeholder="Your password"
           required
           mt="md"
