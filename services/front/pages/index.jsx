@@ -11,7 +11,6 @@ import {
   Navbar,
   NavLink,
   ScrollArea,
-  Text,
   TextInput,
   useMantineTheme,
 } from "@mantine/core";
@@ -63,7 +62,7 @@ export default function Index() {
 
   const [opened, setOpened] = useState(false);
 
-  const bodyComponent = useState("");
+  const [bodyComponent, setBodyComponent] = useState("...body");
 
   const navLinks = [
     {
@@ -71,19 +70,28 @@ export default function Index() {
       variant: "light",
       color: "blue",
       description: "browse all products",
-      icon: <Home24Regular />
+      icon: <Home24Regular />,
+      click: () => {
+        setBodyComponent('body')
+      }
     },{
       label: "subscriptions",
       variant: "light",
       color: "blue",
       description: "subscriptions",
-      icon: <StoreMicrosoft24Regular />
+      icon: <StoreMicrosoft24Regular />,
+      click: () => {
+          setBodyComponent('subscriptions')
+      }
     },{
     label: "your store",
     variant: "light",
     color: "blue",
     description: "manage your own store",
-    icon: <BuildingShop24Regular />
+    icon: <BuildingShop24Regular />,
+      click: () => {
+
+      }
   }]
 
   const navLinks2 = [
@@ -91,17 +99,26 @@ export default function Index() {
       label: "profile",
       variant: "light",
       color: "blue",
-      icon: <Person24Regular />
+      icon: <Person24Regular />,
+      click: () => {
+          setBodyComponent('profile')
+      }
     }, {
     label: "settings",
     variant: "light",
     color: "blue",
-    icon: <PeopleSettings24Regular />
+    icon: <PeopleSettings24Regular />,
+      click: () => {
+          setBodyComponent('settings')
+      }
   }, {
     label: "dashboard",
     variant: "light",
     color: "blue",
-    icon: <PersonBoard24Regular />
+    icon: <PersonBoard24Regular />,
+      click: () => {
+      setBodyComponent('dashboard')
+      }
   }]
 
   return (
@@ -128,23 +145,23 @@ export default function Index() {
             component={ScrollArea}
             position={{ top: 0, left: 0 }}
           >
-            {navLinks.map(e => <NavLink
+            {navLinks.map(e => <span key={e.toString()} onClick={e.click}><NavLink
                 label={e?.label}
                 variant={e?.variant}
                 color={e?.color}
                 key={e.toString()}
                 description={e?.description}
                 icon={e.icon}
-            />)}
+            /></span>)}
             <NavBarDivider text="account & settings" />
-            {navLinks2.map(e => <NavLink
+            {navLinks2.map(e => <span key={e.toString()} onClick={e.click}><NavLink
                 label={e?.label}
                 variant={e?.variant}
                 color={e?.color}
                 key={e.toString()}
                 description={e?.description}
                 icon={e.icon}
-            />)}
+            /></span>)}
             <NavBarDivider text="comment" />
             <NavLink
               label="write us"
@@ -230,7 +247,7 @@ export default function Index() {
         </Header>
       }
     >
-      <Text>body…</Text>
+      <div>{bodyComponent}</div>
     </AppShell>
   );
 }
