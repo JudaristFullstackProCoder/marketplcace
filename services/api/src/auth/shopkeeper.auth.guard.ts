@@ -8,9 +8,6 @@ export class ShopkeeperAuthenticationGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const shopkeeper = request?.session?.shopkeeper;
-    if (!!shopkeeper) {
-      return true;
-    }
-    return false;
+    return !!shopkeeper;
   }
 }

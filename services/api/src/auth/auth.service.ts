@@ -1,5 +1,7 @@
 import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Inject,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -13,26 +15,27 @@ import {
 } from '../superadmin/credentials';
 
 @Injectable()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class AuthService {
   constructor(
     @Inject(UsersRepository) private usersRepository: UsersRepository,
     @Inject(AdminRepository) private adminRepository: AdminRepository,
   ) {}
 
-  async loginUser(email: string, password: string) {
+  async loginUser(phonenumber: string, password: string) {
     try {
       const user = await this.usersRepository
         .getModel()
         .findOne({
-          email: email,
+          phonenumber: phonenumber,
         })
-        .exec();
+        .lean();
       if (!user) {
         return {
-          message: 'This email is not liked to any account',
+          message: 'This phone number is not liked to any account',
           status: 400,
           data: {
-            keys: ['email'],
+            keys: ['phonenumber'],
           },
         };
       }
@@ -42,11 +45,15 @@ export class AuthService {
           message: 'Invalid credentials',
           status: 400,
           data: {
-            keys: ['email', 'password'],
+            keys: ['phonenumber', 'password'],
           },
         };
       }
-      return user;
+      return {
+        message: 'User login successfully',
+        status: 200,
+        data: user,
+      };
     } catch (e) {
       return {
         message: e.message,
@@ -56,12 +63,12 @@ export class AuthService {
     }
   }
 
-  async loginAdmin(email: string, password: string) {
+  async loginAdmin(phonenumber: string, password: string) {
     try {
       const admin = await this.adminRepository
         .getModel()
         .findOne({
-          email: email,
+          phonenumber: phonenumber,
         })
         .exec();
       if (!admin) {

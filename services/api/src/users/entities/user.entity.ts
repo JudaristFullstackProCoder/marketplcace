@@ -15,9 +15,9 @@ export type UserDocument = User & Document<string>;
 })
 export class User {
   @Prop({ required: true, unique: true, type: mongoose.Schema.Types.String })
-  username: string;
+  name: string;
   @Prop({ required: true, unique: true, type: mongoose.Schema.Types.String })
-  email: string;
+  phonenumber: string;
   @Prop({
     required: true,
     type: mongoose.Schema.Types.String,

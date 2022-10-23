@@ -1,7 +1,9 @@
+const apiServerUrl = process.env.API_SERVER;
+
 export default {
-  home: 'http://localhost:3001',
-  userSignUp: 'http://localhost:3001/users',
-  userLogin: 'http://localhost:3001/auth/user/login',
-  openStore: 'http://localhost:3001/stores/open',
-  getSession: 'http://localhost:3001/session',
+  home: apiServerUrl,
+  userSignUp: `${apiServerUrl}/users`,
+  userLogin: `${apiServerUrl}/auth/user/login`,
+  openStore: `${apiServerUrl}/stores/open`,
+  getSession: `${apiServerUrl}/session`,
 };

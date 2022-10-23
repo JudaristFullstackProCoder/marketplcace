@@ -148,8 +148,8 @@ export default class UsersRepository {
           data: users.map(function (e) {
             return {
               id: e._id,
-              username: e.username,
-              email: e.email,
+              name: e.name,
+                phonenumber: e.phonenumber,
               createdAt: e['createdAt'],
               updatedAt: e['updatedAt'],
             };
