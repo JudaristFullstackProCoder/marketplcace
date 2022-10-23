@@ -1,5 +1,7 @@
 import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Inject,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -13,6 +15,7 @@ import {
 } from '../superadmin/credentials';
 
 @Injectable()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class AuthService {
   constructor(
     @Inject(UsersRepository) private usersRepository: UsersRepository,
@@ -26,7 +29,7 @@ export class AuthService {
         .findOne({
           phonenumber: phonenumber,
         })
-        .exec();
+        .lean();
       if (!user) {
         return {
           message: 'This phone number is not liked to any account',

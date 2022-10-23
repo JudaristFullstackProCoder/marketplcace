@@ -8,6 +8,7 @@ import { productViewerSchema } from './entities/product-viewers.entity';
 import { productLikesSchema } from './entities/product-like.entity';
 import { ProductViewersRepository } from './products-viewers.repository';
 import { ProductLikesRepository } from './products-like.repository';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ProductLikesRepository } from './products-like.repository';
     MongooseModule.forFeature([
       { name: 'products_viewers', schema: productViewerSchema },
     ]),
+    UsersModule,
   ],
   controllers: [ProductsController],
   providers: [

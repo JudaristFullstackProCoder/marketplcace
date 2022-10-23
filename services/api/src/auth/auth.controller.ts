@@ -68,12 +68,15 @@ export class AuthController {
   ) {
     const login = await this.authService.loginUser(phonenumber, password);
     if (login.status !== 200) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
       return response.status(login.status).send(login);
     }
-     session['user'] = login;
-     //@ts-ignore
-    return response.status(login.status)
+    session['user'] = login;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    return response
+      .status(login.status)
       .cookie('token', login.data.token, {
         maxAge: 1000 * 60 * 60 * 24 * 30,
       })
