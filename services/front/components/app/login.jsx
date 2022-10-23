@@ -10,11 +10,13 @@ import {
 } from "@mantine/core";
 import endpoints from '../../config/api';
 import { useForm } from "react-hook-form";
+import { Cookies } from 'react-cookie';
 
 import { openModal, closeAllModals } from "@mantine/modals";
 
 import SignUp from "./signup";
 import axios from "axios";
+import Router from "next/router";
 
 export default function Login() {
   const {
@@ -31,7 +33,11 @@ export default function Login() {
     })).data
 
     if (response?.data?.token) {
-      // Router.reload();
+      (new Cookies()).set('token', response.data?.token, {
+        expires: new Date(Date.now() + 1000*60*60*24*30),
+        maxAge: new Date(Date.now() + 1000*60*60*24*30)
+      });
+      Router.reload();
     } else {
       //
     }
