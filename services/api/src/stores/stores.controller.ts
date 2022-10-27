@@ -15,6 +15,7 @@ import {
   UnauthorizedException,
   UploadedFile,
   UseInterceptors,
+  Res,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -58,6 +59,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { PERMS_ADD_STORE_IMAGE } from '../auth/perms/shopkeeper';
 import { ShopkeeperAuthenticationGuard } from '../auth/shopkeeper.auth.guard';
 import { ShopkeeperPermissionsGuard } from '../auth/permission.skp.guard';
+import { Response } from 'express';
 @ApiTags('Store')
 @Controller('stores')
 export class StoresController {
@@ -147,30 +149,39 @@ export class StoresController {
     status: 404,
   })
   @Get('open')
-  async OpenStore(@Session() session: Record<string, any>) {
+  /**
+   * Load store information in the session…
+   */
+  async OpenStore(@Session() session: Record<string, any>, @Res() response: Response) {
     const store = await this.storesService.find({
       shopkeeper: session.user._id,
     });
+
     if (
-      !(store instanceof InternalServerErrorException) &&
-      !(store instanceof NotFoundException)
+      store.status === 200
     ) {
-      if (store.shopkeeper !== session.user._id) {
-        return new UnauthorizedException('');
-      }
-      const response = await this.shopkeeperRepository
+      const shopkeeper = await this.shopkeeperRepository
         .getModel()
         .findOne({ user: session.user_id })
         .exec();
-      const shopkeeper = response;
-      this.eventEmitter.emit(STORE_OPENED, store, shopkeeper);
+      session["store"] = store.data;
+      session["shopkeeper"] = shopkeeper;
       return {
-        shopkeeeperId: shopkeeper,
-        userId: session.user._id,
-        storeId: store._id,
-      };
+        message: "user store opened successfully…",
+        status: 200,
+        data: {
+          shopkeeeperId: shopkeeper.id,
+          userId: session?.user?._id,
+          storeId: store?.data?._id,
+        }
+      }
+    } else {
+      return {
+        message: "can't open store…",
+        status: 500,
+        data: {},
+      }
     }
-    return store;
   }
 
   @UseGuards(AdminAuthenticationGuard)

@@ -14,36 +14,65 @@ export class StoresService {
   constructor(
     @Inject(StoreRepository) private storeRepository: StoreRepository,
   ) {}
+
+  handleTryCatch (func: Function, args: Array<String|Record<string, unknown>|UpdateStoreDto> = []) {
+    try {
+      return {
+        data: func(...args),
+        message: 'operation successfully executed',
+        status: 500,
+      }
+    } catch (e) {
+      return {
+        data: e,
+        message: e.message,
+        status: 500,
+      }
+    }
+  }
+
   create(createCategoryDto: CreateStoreDto) {
-    return this.storeRepository.addStore(createCategoryDto);
+    try {
+      return {
+        data: this.storeRepository.addStore(createCategoryDto),
+        message: 'operation successfully executed',
+        status: 500,
+      }
+    } catch (e) {
+      return {
+        data: e,
+        message: e.message,
+        status: 500,
+      }
+    }
   }
 
   findAll() {
-    return this.storeRepository.getAllStore();
+    return this.handleTryCatch(this.storeRepository.getAllStore);
   }
 
   findOne(id: string) {
-    return this.storeRepository.getStoreItem(id);
+    return this.handleTryCatch(this.storeRepository.getStoreItem, [id]);
   }
 
   find(filters: Record<string, unknown>) {
-    return this.storeRepository.findStore(filters);
+    return this.handleTryCatch(this.storeRepository.findStore, [filters]);
   }
 
   update(id: string, updateCategoryDto: UpdateStoreDto) {
-    return this.storeRepository.updateStore(id, updateCategoryDto);
+    return this.handleTryCatch(this.storeRepository.updateStore, [id, updateCategoryDto]);
   }
 
   remove(id: string) {
-    return this.storeRepository.deleteStore(id);
+    return this.handleTryCatch(this.storeRepository.deleteStore, [id]);
   }
 
   addWys(storeId: string, wysId: never) {
-    return this.storeRepository.addWys(storeId, wysId);
+    return this.handleTryCatch(this.storeRepository.addWys, [storeId, wysId]);
   }
 
   removeWys(storeId: string, wysId: never) {
-    return this.storeRepository.removeWys(storeId, wysId);
+    return this.handleTryCatch(this.storeRepository.removeWys, [storeId, wysId]);
   }
 
   async setOrReplaceFeaturedImage(
@@ -62,19 +91,23 @@ export class StoresService {
     try {
       const store = await this.storeRepository.getStoreItem(storeId);
       if (
-        store instanceof InternalServerErrorException ||
-        store instanceof NotFoundException
+        store.status !== 200
       ) {
         return store;
       }
-      if (store.shopkeeper !== session.shopkeeper['_id']) {
-        return new UnauthorizedException(
-          'Sorry, you are not the owner of this resource',
-        );
+      if (store.data?.shopkeeper !== session.shopkeeper['_id']) {
+        return {
+          message: 'Sorry, you are not the owner of this resource',
+          status: 401,
+          data: { error: "Unauthorised !"}
+        }
       }
       return true;
     } catch (e) {
-      return new InternalServerErrorException(e);
-    }
+        return {
+          message: e.message,
+          status: 500,
+          data: e,
+        }
   }
-}
+}}
