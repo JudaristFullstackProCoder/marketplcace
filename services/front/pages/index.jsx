@@ -36,6 +36,7 @@ import ToggleTheme from "../components/theme/toogleTheme";
 import {openModal} from "@mantine/modals";
 import Login from "../components/app/login";
 import * as axios from "axios";
+import Router from "next/router";
 
 
 const NavBarDivider = ({text}) => <Divider
@@ -90,7 +91,7 @@ export default function Index() {
     description: "manage your own store",
     icon: <BuildingShop24Regular />,
       click: () => {
-
+        window.location = '/store'
       }
   }]
 
