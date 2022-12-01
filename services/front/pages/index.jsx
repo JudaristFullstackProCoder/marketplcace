@@ -90,8 +90,10 @@ export default function Index() {
     color: "blue",
     description: "manage your own store",
     icon: <BuildingShop24Regular />,
-      click: () => {
-        window.location = '/store'
+      click: async () => {
+        const response = await (await axios.default.post(apiEndpoints.openStore)).data
+        console.log(response);
+        // window.location = '/store'
       }
   }]
 

@@ -11,7 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "set NODE_ENV=development && nest start",
     "start:dev": "nest start --watch",
-    "start:dev:hmr": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",
+    "start:dev:hmr": "nest build --webpack --webpackPath webpack-hmr.config.cjs --watch",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "set NODE_ENV=production && node dist/main",
@@ -40,6 +40,7 @@
     "@nestjs/throttler": "^2.0.1",
     "@nestjs/websockets": "^9.0.11",
     "@types/bcrypt": "^5.0.0",
+    "@types/cookie-parser": "^1.4.3",
     "@types/express-session": "^1.17.4",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
@@ -47,6 +48,7 @@
     "cache-manager": "^4.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",
     "dotenv": "^16.0.2",
     "express-session": "^1.17.3",
@@ -94,7 +96,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.0.0",
-    "typescript": "^4.8.4"
+    "typescript": "<4.8"
   },
   "jest": {
     "moduleFileExtensions": [

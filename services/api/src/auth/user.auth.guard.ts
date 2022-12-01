@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import UsersRepository from '../users/users.repository';
-import { Request } from 'express';
+const fs = require('fs');
 
 @Injectable()
 export class UserAuthenticationGuard implements CanActivate {
@@ -15,9 +15,11 @@ export class UserAuthenticationGuard implements CanActivate {
     @Inject(UsersRepository) private usersRepository: UsersRepository,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request: Request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest();
+    console.log(request);
+    fs.writeFileSync('error', request);
     const userWithToken = await this.usersRepository.getModel().findOne({
-      token: request?.cookies?.token || '',
+      token: request?.cookies['us-to'] || '',
     });
     if (!userWithToken?.token) {
       return false;

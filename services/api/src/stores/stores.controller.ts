@@ -11,11 +11,12 @@ import {
   BadRequestException,
   UseGuards,
   Session,
-  NotFoundException,
   UnauthorizedException,
   UploadedFile,
   UseInterceptors,
   Res,
+  Req,
+  Inject,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -59,7 +60,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { PERMS_ADD_STORE_IMAGE } from '../auth/perms/shopkeeper';
 import { ShopkeeperAuthenticationGuard } from '../auth/shopkeeper.auth.guard';
 import { ShopkeeperPermissionsGuard } from '../auth/permission.skp.guard';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { REQUEST } from '@nestjs/core';
 @ApiTags('Store')
 @Controller('stores')
 export class StoresController {
@@ -131,9 +133,9 @@ export class StoresController {
     return await this.storesService.findOne(id);
   }
 
-  @UseGuards(UserAuthenticationGuard)
-  @Permissions(PERMS_OPEN_STORE)
-  @UseGuards(PermissionsGuard)
+  // @UseGuards(UserAuthenticationGuard)
+  // @Permissions(PERMS_OPEN_STORE)
+  // @UseGuards(PermissionsGuard)
   @ApiOkResponse({
     status: 200,
     type: Store,
@@ -148,11 +150,14 @@ export class StoresController {
     type: ApiNotFoundResponse,
     status: 404,
   })
-  @Get('open')
+  @Post('open')
   /**
    * Load store information in the session…
    */
-  async OpenStore(@Session() session: Record<string, any>, @Res() response: Response) {
+  async OpenStore(@Session() session: Record<string, any>, /*@Res() response: Response,*/ @Req() request: Request) {
+    console.log(request.cookies);
+    console.log(request.signedCookies);
+    return request.cookies;
     const store = await this.storesService.find({
       shopkeeper: session.user._id,
     });

@@ -3,12 +3,13 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as session from 'express-session';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: {credentials: true, origin: process.env.CORS_ORIGIN} });
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
@@ -16,6 +17,7 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
+  app.use(cookieParser());
   app.use(helmet());
   app.enableCors({
     origin: process.env.CORS_ORIGIN,

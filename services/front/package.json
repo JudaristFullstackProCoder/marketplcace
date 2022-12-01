@@ -37,6 +37,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.34.0",
+    "react-use-cookie": "^1.4.0",
     "store": "^2.0.12"
   },
   "devDependencies": {

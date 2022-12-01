@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "module": "commonjs",
+"module": "commonjs",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -16,6 +15,7 @@
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
+    "moduleResolution": "node",
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
