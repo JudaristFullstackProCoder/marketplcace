@@ -4,6 +4,8 @@ import { ADMIN_DEFAULT_PERMISSIONS } from '../../auth/perms/admin';
 
 export type AdminDocument = Admin & Document<string>;
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 @Schema({
   skipVersioning: { ['__v']: true },
   autoIndex: true,
@@ -13,6 +15,8 @@ export type AdminDocument = Admin & Document<string>;
   },
   timestamps: true,
 })
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export class Admin {
   @Prop({
     required: true,
@@ -23,6 +27,8 @@ export class Admin {
     lowercase: true,
     trim: true,
   })
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   username: string;
   @Prop({
     required: true,
@@ -33,6 +39,8 @@ export class Admin {
     lowercase: true,
     trim: true,
   })
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   email: string;
   @Prop({
     required: true,
@@ -40,6 +48,8 @@ export class Admin {
     unique: true,
     select: false,
   })
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   password: string;
   @Prop({
     required: true,
@@ -48,12 +58,16 @@ export class Admin {
     type: mongoose.Schema.Types.String,
     immutable: true,
   })
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   role: string;
   @Prop({
     required: true,
     default: ADMIN_DEFAULT_PERMISSIONS,
     type: mongoose.Schema.Types.Array,
   })
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   permissions: string[];
 }
 

@@ -133,7 +133,7 @@ export class StoresController {
     return await this.storesService.findOne(id);
   }
 
-  // @UseGuards(UserAuthenticationGuard)
+  @UseGuards(UserAuthenticationGuard)
   // @Permissions(PERMS_OPEN_STORE)
   // @UseGuards(PermissionsGuard)
   @ApiOkResponse({
@@ -154,20 +154,18 @@ export class StoresController {
   /**
    * Load store information in the session…
    */
-  async OpenStore(@Session() session: Record<string, any>, /*@Res() response: Response,*/ @Req() request: Request) {
-    console.log(request.cookies);
-    console.log(request.signedCookies);
-    return request.cookies;
-    const store = await this.storesService.find({
-      shopkeeper: session.user._id,
+  async OpenStore(@Session() session: Record<string, any>, @Req() request: Request) {
+    console.log(session.user._id.toString());
+    const store = this.storesService.find({
+      shopkeeper: session.user._id.toString(),
     });
-
+    console.log(store);
     if (
       store.status === 200
     ) {
       const shopkeeper = await this.shopkeeperRepository
         .getModel()
-        .findOne({ user: session.user_id })
+        .findOne({ user: session.user._id.toString() })
         .exec();
       session["store"] = store.data;
       session["shopkeeper"] = shopkeeper;

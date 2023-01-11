@@ -54,7 +54,7 @@ export class StoreRepository {
   ) {
     return await this.handleTryCatch(this.storeModel.findById, [id]);
   }
-  async findStore(filters: Record<string, unknown>) {
+  findStore(filters: Record<string, unknown>) {
     return this.handleTryCatch(this.storeModel.findOne, [filters]);
   }
 

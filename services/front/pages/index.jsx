@@ -37,6 +37,7 @@ import {openModal} from "@mantine/modals";
 import Login from "../components/app/login";
 import * as axios from "axios";
 import Router from "next/router";
+import { getCookie } from "react-use-cookie";
 
 
 const NavBarDivider = ({text}) => <Divider
@@ -91,7 +92,11 @@ export default function Index() {
     description: "manage your own store",
     icon: <BuildingShop24Regular />,
       click: async () => {
-        const response = await (await axios.default.post(apiEndpoints.openStore)).data
+        const response = await (await axios.default.post(apiEndpoints.openStore, {}, {
+          headers: {
+            token: getCookie("us-to")
+          }
+        })).data
         console.log(response);
         // window.location = '/store'
       }
