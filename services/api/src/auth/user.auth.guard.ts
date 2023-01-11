@@ -17,7 +17,7 @@ export class UserAuthenticationGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const userWithToken = await this.usersRepository.getModel().findOne({
-      token: request?.cookies?.token || '',
+      token: request.headers['token'] || '',
     });
     if (!userWithToken?.token) {
       return false;

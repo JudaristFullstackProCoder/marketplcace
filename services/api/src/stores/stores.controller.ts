@@ -11,10 +11,12 @@ import {
   BadRequestException,
   UseGuards,
   Session,
-  NotFoundException,
   UnauthorizedException,
   UploadedFile,
   UseInterceptors,
+  Res,
+  Req,
+  Inject,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -58,6 +60,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { PERMS_ADD_STORE_IMAGE } from '../auth/perms/shopkeeper';
 import { ShopkeeperAuthenticationGuard } from '../auth/shopkeeper.auth.guard';
 import { ShopkeeperPermissionsGuard } from '../auth/permission.skp.guard';
+import { Request, Response } from 'express';
+import { REQUEST } from '@nestjs/core';
 @ApiTags('Store')
 @Controller('stores')
 export class StoresController {
@@ -130,8 +134,8 @@ export class StoresController {
   }
 
   @UseGuards(UserAuthenticationGuard)
-  @Permissions(PERMS_OPEN_STORE)
-  @UseGuards(PermissionsGuard)
+  // @Permissions(PERMS_OPEN_STORE)
+  // @UseGuards(PermissionsGuard)
   @ApiOkResponse({
     status: 200,
     type: Store,
@@ -146,31 +150,41 @@ export class StoresController {
     type: ApiNotFoundResponse,
     status: 404,
   })
-  @Get('open')
-  async OpenStore(@Session() session: Record<string, any>) {
-    const store = await this.storesService.find({
-      shopkeeper: session.user._id,
+  @Post('open')
+  /**
+   * Load store information in the session…
+   */
+  async OpenStore(@Session() session: Record<string, any>, @Req() request: Request) {
+    console.log(session.user._id.toString());
+    const store = this.storesService.find({
+      shopkeeper: session.user._id.toString(),
     });
+    console.log(store);
     if (
-      !(store instanceof InternalServerErrorException) &&
-      !(store instanceof NotFoundException)
+      store.status === 200
     ) {
-      if (store.shopkeeper !== session.user._id) {
-        return new UnauthorizedException('');
-      }
-      const response = await this.shopkeeperRepository
+      const shopkeeper = await this.shopkeeperRepository
         .getModel()
-        .findOne({ user: session.user_id })
+        .findOne({ user: session.user._id.toString() })
         .exec();
-      const shopkeeper = response;
-      this.eventEmitter.emit(STORE_OPENED, store, shopkeeper);
+      session["store"] = store.data;
+      session["shopkeeper"] = shopkeeper;
       return {
-        shopkeeeperId: shopkeeper,
-        userId: session.user._id,
-        storeId: store._id,
-      };
+        message: "user store opened successfully…",
+        status: 200,
+        data: {
+          shopkeeeperId: shopkeeper.id,
+          userId: session?.user?._id,
+          storeId: store?.data?._id,
+        }
+      }
+    } else {
+      return {
+        message: "can't open store…",
+        status: 500,
+        data: {},
+      }
     }
-    return store;
   }
 
   @UseGuards(AdminAuthenticationGuard)

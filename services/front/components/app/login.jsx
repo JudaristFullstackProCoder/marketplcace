@@ -10,11 +10,14 @@ import {
 } from "@mantine/core";
 import endpoints from '../../config/api';
 import { useForm } from "react-hook-form";
+import { setCookie } from "react-use-cookie";
 
 import { openModal, closeAllModals } from "@mantine/modals";
 
 import SignUp from "./signup";
 import axios from "axios";
+import Router from "next/router";
+import { CV_USER_TOKEN_NAME } from "../../config/constant";
 
 export default function Login() {
   const {
@@ -31,7 +34,10 @@ export default function Login() {
     })).data
 
     if (response?.data?.token) {
-      // Router.reload();
+      setCookie(CV_USER_TOKEN_NAME, response.data.token, {
+        days: 31,
+      });
+      Router.reload();
     } else {
       //
     }

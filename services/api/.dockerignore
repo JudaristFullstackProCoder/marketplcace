@@ -1,5 +1,5 @@
 ./node_modules
+node_modules
 ./dist
-./.dockerignore
 ./.vscode
 architacture.dio

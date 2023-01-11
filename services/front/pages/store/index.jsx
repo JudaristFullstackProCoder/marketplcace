@@ -11,33 +11,30 @@ import {
   Navbar,
   NavLink,
   ScrollArea,
-  TextInput,
   useMantineTheme,
 } from "@mantine/core";
 
-import IconLogto from "../public/icon";
+import IconLogto from "../../public/icon";
 
 import {IconSearch, IconUserCircle} from "@tabler/icons";
 
 import {
-  BuildingShop24Regular,
+    Alert24Regular,
   Comment24Regular,
   Home24Regular,
-  PeopleSettings24Regular,
-  Person24Regular,
-  PersonBoard24Regular,
-  Search24Regular,
+  Image24Regular,
+  LauncherSettings24Regular,
+  ShoppingBag24Regular,
   StoreMicrosoft24Regular,
 } from "@fluentui/react-icons";
 
-import apiEndpoints from "../config/api";
+import apiEndpoints from "../../config/api";
 
-import ToggleTheme from "../components/theme/toogleTheme";
+import ToggleTheme from "../../components/theme/toogleTheme";
 import {openModal} from "@mantine/modals";
-import Login from "../components/app/login";
+import Login from "../../components/app/login";
 import * as axios from "axios";
 import Router from "next/router";
-import { getCookie } from "react-use-cookie";
 
 
 const NavBarDivider = ({text}) => <Divider
@@ -51,7 +48,7 @@ const NavBarDivider = ({text}) => <Divider
     }
 />
 
-export default function Index() {
+export default function UserStoreIndex() {
   const theme = useMantineTheme();
   const [session, setSession] = useState({});
 
@@ -64,68 +61,62 @@ export default function Index() {
 
   const [opened, setOpened] = useState(false);
 
-  const [bodyComponent, setBodyComponent] = useState("...body");
+  const [bodyComponent, setBodyComponent] = useState("dashboard");
 
   const navLinks = [
     {
-      label: "home",
+      label: "Dashboard",
       variant: "light",
       color: "blue",
-      description: "browse all products",
+      description: "",
       icon: <Home24Regular />,
       click: () => {
         setBodyComponent('body')
       }
     },{
-      label: "subscriptions",
+      label: "orders",
       variant: "light",
       color: "blue",
-      description: "subscriptions",
+      description: "",
       icon: <StoreMicrosoft24Regular />,
       click: () => {
-          setBodyComponent('subscriptions')
+          setBodyComponent('orders')
       }
     },{
-    label: "your store",
+    label: "Products",
     variant: "light",
     color: "blue",
-    description: "manage your own store",
-    icon: <BuildingShop24Regular />,
-      click: async () => {
-        const response = await (await axios.default.post(apiEndpoints.openStore, {}, {
-          headers: {
-            token: getCookie("us-to")
-          }
-        })).data
-        console.log(response);
-        // window.location = '/store'
+    description: "",
+    icon: <ShoppingBag24Regular />,
+      click: () => {
+        setBodyComponent('store')
       }
   }]
 
   const navLinks2 = [
     {
-      label: "profile",
+      label: "Notification",
       variant: "light",
       color: "blue",
-      icon: <Person24Regular />,
+      icon: <Alert24Regular />,
       click: () => {
-          setBodyComponent('profile')
+          setBodyComponent('notification')
       }
     }, {
     label: "settings",
     variant: "light",
     color: "blue",
-    icon: <PeopleSettings24Regular />,
+    icon: <LauncherSettings24Regular />,
       click: () => {
           setBodyComponent('settings')
       }
   }, {
-    label: "dashboard",
+    label: "Images",
     variant: "light",
     color: "blue",
-    icon: <PersonBoard24Regular />,
+    icon: <Image24Regular />,
       click: () => {
-      setBodyComponent('dashboard')
+      setBodyComponent('images')
       }
   }]
 
@@ -210,27 +201,6 @@ export default function Index() {
                 }}><IconLogto /></div>
               </div>
             </MediaQuery>
-            {/* <IconLogto /> */}
-            <Group
-              sx={(theme) => ({
-                [theme.fn.largerThan("xl")]: {
-                  display: "none",
-                },
-              })}
-            >
-              <IconSearch />
-            </Group>
-            <TextInput
-              placeholder="search"
-              icon={<Search24Regular filled={"true"} primaryFill="blue" />}
-              size="sm"
-              sx={(theme) => ({
-                width: "45vw",
-                [theme.fn.smallerThan("xl")]: {
-                  display: "none",
-                },
-              })}
-            />
             <Group sx={{ paddingRight: "10px" }} grow={false}>
               <Button
                 leftIcon={<IconUserCircle />}

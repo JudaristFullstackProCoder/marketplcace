@@ -6,4 +6,5 @@ export default {
   userLogin: `${apiServerUrl}/auth/user/login`,
   openStore: `${apiServerUrl}/stores/open`,
   getSession: `${apiServerUrl}/session`,
+  openStore: `${apiServerUrl}/stores/open`,
 };

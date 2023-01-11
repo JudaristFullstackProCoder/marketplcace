@@ -79,7 +79,7 @@ export default function SignUp() {
         <TextInput
           label="Phone number"
           disabled={isSubmitting}
-          placeholder="+237 111 111 111"
+          placeholder="111 111 111"
           {...register("phonenumber", {
             required: true,
           })}

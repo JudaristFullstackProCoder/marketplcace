@@ -17,6 +17,23 @@ export class StoreRepository {
   constructor(
     @InjectModel('stores') readonly storeModel: Model<StoreDocument>,
   ) {}
+
+    async handleTryCatch (func: Function, args: Array<String|Record<string, unknown>|UpdateStoreDto> = []) {
+    try {
+      return {
+        data: await func(...args),
+        message: 'operation successfully executed',
+        status: 500,
+      }
+    } catch (e) {
+      return {
+        data: e,
+        message: e.message,
+        status: 500,
+      }
+    }
+  }
+
   async addStore(
     store: CreateStoreDto,
   ): Promise<Store | InternalServerErrorException> {
@@ -27,60 +44,22 @@ export class StoreRepository {
     }
   }
   async deleteStore(id: string) {
-    try {
-      return (
-        (await this.storeModel.findByIdAndDelete(id)) ??
-        new BadRequestException()
-      );
-    } catch (e) {
-      return new InternalServerErrorException(e);
-    }
+    return await this.handleTryCatch(this.storeModel.findByIdAndDelete, [id]);
   }
   async updateStore(id: string, store: UpdateStoreDto) {
-    try {
-      return (
-        (await this.storeModel.findByIdAndUpdate(id, store)) ??
-        new NotImplementedException()
-      );
-    } catch (e) {
-      return new InternalServerErrorException(e);
-    }
+    return await this.handleTryCatch(this.storeModel.findByIdAndUpdate, [id, store]);
   }
   async getStoreItem(
     id: string,
-  ): Promise<StoreDocument | InternalServerErrorException | NotFoundException> {
-    try {
-      const store = await this.storeModel.findById(id);
-      if (!(store instanceof BadRequestException)) {
-        if (!store) {
-          return new NotFoundException();
-        }
-      }
-      return remove__v(store);
-    } catch (e) {
-      return new InternalServerErrorException(e);
-    }
+  ) {
+    return await this.handleTryCatch(this.storeModel.findById, [id]);
   }
-  async findStore(filters: Record<string, unknown>) {
-    try {
-      const store = await this.storeModel.findOne(filters);
-      if (!store) {
-        return new NotFoundException();
-      }
-      return remove__v(store);
-    } catch (e) {
-      return new InternalServerErrorException(e);
-    }
+  findStore(filters: Record<string, unknown>) {
+    return this.handleTryCatch(this.storeModel.findOne, [filters]);
   }
 
-  async getAllStore(): Promise<
-    NotFoundException | InternalServerErrorException | StoreDocument[]
-  > {
-    try {
-      return (await this.storeModel.find()).map((store) => remove__v(store));
-    } catch (e) {
-      return new InternalServerErrorException(e);
-    }
+  async getAllStore() {
+    return await this.handleTryCatch(this.storeModel.find);
   }
 
   async setOrReplaceFeaturedImage(
@@ -96,49 +75,20 @@ export class StoreRepository {
     } catch (e) {
       return new InternalServerErrorException(e);
     }
+    // return this.handleTryCatch(this.storeModel.findByIdAndUpdate, [storeId, {image: newImage,}]);
   }
 
   async addWys(
     storeId: string,
     domainId: never,
-  ): Promise<InternalServerErrorException | ModifyResult<StoreDocument>> {
-    try {
-      return (
-        (await this.storeModel.findOneAndUpdate(
-          {
-            _id: storeId,
-          },
-          {
-            $push: {
-              wys: domainId,
-            },
-          },
-        )) ?? new NotImplementedException()
-      );
-    } catch (e) {
-      return new InternalServerErrorException(e);
-    }
+  ){
+    return await this.handleTryCatch(this.storeModel.findOneAndUpdate, [{ _id: storeId,}, {$push: {wys: domainId,}}]);
   }
 
   async removeWys(
     storeId: string,
     domainId: never, // never to skip error i don't no for what
-  ): Promise<InternalServerErrorException | ModifyResult<StoreDocument>> {
-    try {
-      return (
-        (await this.storeModel.findOneAndUpdate(
-          {
-            _id: storeId,
-          },
-          {
-            $pull: {
-              wys: domainId,
-            },
-          },
-        )) ?? new NotImplementedException()
-      );
-    } catch (e) {
-      return new InternalServerErrorException(e);
-    }
+  ) {
+    return await this.handleTryCatch(this.storeModel.findOneAndUpdate, [{ _id: storeId,}, {$pull: {wys: domainId,}}]);
   }
 }
